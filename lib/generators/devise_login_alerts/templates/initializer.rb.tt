@@ -1,0 +1,33 @@
+DeviseLoginAlerts.configure do |config|
+  # Where the client IP comes from: :remote_ip (default), :ip, :cloudflare, a header name, or ->(request) { ... }
+  # config.ip_resolver = :remote_ip
+
+  # With :cloudflare, only trust CF-Connecting-IP when request.remote_ip is a Cloudflare address.
+  # config.verify_cloudflare_peer = false
+
+  # Rough location for the alert email: nil, :cloudflare, or ->(request, ip) { { country_code:, city: } }
+  # config.location_resolver = nil
+
+  # How a stored country code is shown in the email, e.g. with the countries gem:
+  # config.country_name = ->(code) { ISO3166::Country[code]&.translation(I18n.locale.to_s) || code }
+
+  # config.cookie_name = 'devise_login_alerts_device'
+  # config.cookie_lifetime = 1.year
+  # config.cookie_options = { domain: :all }
+
+  # The first device a user signs in from is remembered without an alert.
+  # config.alert_on_first_device = false
+
+  # config.skip_alert_if = ->(user, login_attempt) { false }
+
+  # config.mailer = 'DeviseLoginAlerts::Mailer'
+  # config.parent_mailer = 'ActionMailer::Base'
+  # config.mailer_sender = 'security@example.com'
+  # config.deliver_later = true
+  # config.app_name = -> { Rails.application.class.module_parent_name }
+  # config.security_url = ->(user, login_attempt) { Rails.application.routes.url_helpers.edit_user_registration_url }
+
+  # Used by DeviseLoginAlerts.purge!, which you should run on a schedule.
+  # config.attempt_retention = 90.days
+  # config.device_retention = 1.year
+end

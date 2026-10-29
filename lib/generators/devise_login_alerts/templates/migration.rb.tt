@@ -1,0 +1,32 @@
+class CreateDeviseLoginAlerts < ActiveRecord::Migration<%= migration_version %>
+  def change
+    create_table :devise_login_alerts_devices do |t|
+      t.references :user, polymorphic: true, null: false, index: false
+      t.string :token_digest, null: false
+      t.string :user_agent, limit: 512
+      t.datetime :last_seen_at, null: false
+      t.timestamps
+    end
+    add_index :devise_login_alerts_devices, %i[user_type user_id token_digest],
+              unique: true, name: 'index_devise_login_alerts_devices_on_user_and_token'
+    add_index :devise_login_alerts_devices, :last_seen_at
+
+    create_table :devise_login_alerts_login_attempts do |t|
+      t.references :user, polymorphic: true, null: false, index: false
+      t.references :device, foreign_key: { to_table: :devise_login_alerts_devices, on_delete: :nullify }
+      t.string :scope, null: false
+      t.boolean :successful, null: false
+      t.string :failure_reason
+      t.boolean :new_device, null: false, default: false
+      t.boolean :alerted, null: false, default: false
+      t.string :ip
+      t.string :country_code, limit: 2
+      t.string :city
+      t.string :user_agent, limit: 512
+      t.datetime :created_at, null: false
+    end
+    add_index :devise_login_alerts_login_attempts, %i[user_type user_id created_at],
+              name: 'index_devise_login_alerts_login_attempts_on_user_and_created_at'
+    add_index :devise_login_alerts_login_attempts, :created_at
+  end
+end

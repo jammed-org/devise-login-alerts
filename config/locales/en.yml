@@ -1,0 +1,17 @@
+en:
+  devise_login_alerts:
+    mailer:
+      new_device_login:
+        subject: "New sign-in to your %{app_name} account"
+        greeting: "Hi %{name},"
+        greeting_without_name: "Hi,"
+        intro: "Your %{app_name} account (%{email}) was just signed in to from a device or browser we haven't seen before."
+        when: "When"
+        where: "Where"
+        where_hint: "approximate, based on the IP address"
+        ip_address: "IP address"
+        device: "Device"
+        unknown: "Unknown"
+        was_you: "If this was you, you don't need to do anything. You'll also get this email after clearing your browser's cookies or signing in from a private window."
+        was_not_you: "If this wasn't you, change your password straight away."
+        change_password: "Change your password"

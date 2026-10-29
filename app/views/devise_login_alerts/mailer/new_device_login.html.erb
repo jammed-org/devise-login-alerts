@@ -1,0 +1,33 @@
+<% signed_in_at = @login_attempt.created_at.in_time_zone %>
+<p><%= @user.try(:name).present? ? t('.greeting', name: @user.name) : t('.greeting_without_name') %></p>
+
+<p><%= t('.intro', app_name: @app_name, email: @user.email) %></p>
+
+<table cellpadding="4" cellspacing="0" border="0">
+  <tr>
+    <td><strong><%= t('.when') %></strong></td>
+    <td><%= l(signed_in_at, format: :long) %> (<%= signed_in_at.zone %>)</td>
+  </tr>
+  <tr>
+    <td><strong><%= t('.where') %></strong></td>
+    <td>
+      <%= @login_attempt.location || t('.unknown') %>
+      <% if @login_attempt.location %><br><small><%= t('.where_hint') %></small><% end %>
+    </td>
+  </tr>
+  <tr>
+    <td><strong><%= t('.ip_address') %></strong></td>
+    <td><%= @login_attempt.ip || t('.unknown') %></td>
+  </tr>
+  <tr>
+    <td><strong><%= t('.device') %></strong></td>
+    <td><%= @login_attempt.device_summary || t('.unknown') %></td>
+  </tr>
+</table>
+
+<p><%= t('.was_you') %></p>
+
+<p>
+  <%= t('.was_not_you') %>
+  <% if @security_url %><br><a href="<%= @security_url %>"><%= t('.change_password') %></a><% end %>
+</p>
