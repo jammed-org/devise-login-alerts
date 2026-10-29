@@ -101,7 +101,7 @@ end
 
 ### IP addresses behind a proxy or CDN
 
-`request.remote_ip` is right for most apps once Rails' trusted proxies are configured. Behind Cloudflare use `:cloudflare`, which reads `CF-Connecting-IP`. Anyone who can reach your origin directly can send that header, so either only accept traffic from Cloudflare or turn on `verify_cloudflare_peer`.
+`request.remote_ip` is right for most apps once Rails' trusted proxies are configured. Behind Cloudflare use `:cloudflare`, which reads `CF-Connecting-IP`. Anyone who can reach your origin directly can send that header, so either only accept traffic from Cloudflare or turn on `verify_cloudflare_peer`, which then also guards the `:cloudflare` location headers.
 
 ### Location
 

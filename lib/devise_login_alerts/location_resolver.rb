@@ -16,6 +16,8 @@ module DeviseLoginAlerts
     end
 
     def cloudflare(request)
+      return {} if DeviseLoginAlerts.config.verify_cloudflare_peer && !IpResolver.cloudflare_ip?(request.remote_ip)
+
       country = request.get_header('HTTP_CF_IPCOUNTRY').presence
       {
         country_code: (country unless country == UNKNOWN_COUNTRY),

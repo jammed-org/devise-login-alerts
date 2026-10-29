@@ -30,6 +30,24 @@ RSpec.describe DeviseLoginAlerts::LocationResolver do
     expect(resolve(:cloudflare, request)[:city]).to eq('Zürich')
   end
 
+  context 'when verify_cloudflare_peer is on' do
+    before { DeviseLoginAlerts.config.verify_cloudflare_peer = true }
+
+    def request_from(remote_addr)
+      request = request_with('CF-IPCountry' => 'GB', 'CF-IPCity' => 'Manchester')
+      request.set_header('REMOTE_ADDR', remote_addr)
+      request
+    end
+
+    it 'trusts location headers from a Cloudflare address' do
+      expect(resolve(:cloudflare, request_from('173.245.48.10'))).to eq(country_code: 'GB', city: 'Manchester')
+    end
+
+    it 'ignores spoofed location headers from anywhere else' do
+      expect(resolve(:cloudflare, request_from('198.51.100.4'))).to eq({})
+    end
+  end
+
   it 'keeps only the location keys a callable returns' do
     resolver = ->(_request, ip) { { country_code: 'FR', city: 'Paris', ip: ip, latitude: 48.8 } }
 
