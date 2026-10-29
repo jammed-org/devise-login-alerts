@@ -136,6 +136,35 @@ RSpec.describe 'Sign-in tracking' do
     end
   end
 
+  context 'when tracking fails part-way through a sign-in from a new browser', :reports_errors do
+    before do
+      sign_in_with
+      new_browser
+    end
+
+    it 'does not remember the browser if the attempt cannot be saved, so the next sign-in still alerts' do
+      allow(DeviseLoginAlerts::IpResolver).to receive(:call).and_raise(ActiveRecord::ValueTooLong).once
+
+      expect { sign_in_with }.not_to(change { user.login_devices.count })
+      expect(cookies['devise_login_alerts_device']).to be_blank
+
+      allow(DeviseLoginAlerts::IpResolver).to receive(:call).and_call_original
+      delete '/users/sign_out'
+      expect { sign_in_with }.to have_enqueued_mail(DeviseLoginAlerts::Mailer, :new_device_login)
+    end
+
+    it 'does not remember the browser if the alert cannot be queued, so the next sign-in still alerts' do
+      allow(DeviseLoginAlerts::Mailer).to receive(:with).and_raise(StandardError, 'queue unavailable').once
+
+      sign_in_with
+      expect(cookies['devise_login_alerts_device']).to be_blank
+
+      allow(DeviseLoginAlerts::Mailer).to receive(:with).and_call_original
+      delete '/users/sign_out'
+      expect { sign_in_with }.to have_enqueued_mail(DeviseLoginAlerts::Mailer, :new_device_login)
+    end
+  end
+
   it 'never blocks the sign-in when tracking fails', :reports_errors do
     allow(DeviseLoginAlerts::Tracker).to receive(:new).and_raise(ActiveRecord::StatementInvalid, 'boom')
 

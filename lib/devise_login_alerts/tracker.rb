@@ -8,14 +8,19 @@ module DeviseLoginAlerts
       @scope = scope.to_s
     end
 
+    # The cookie is written last so a failure anywhere before it leaves the browser unknown, and the next sign-in alerts.
     def record_success(alert: true)
       cookie = DeviceCookie.new(@request)
       had_devices = @user.login_devices.exists?
-      device = touch_device(cookie.token!)
-      cookie.write!
 
-      attempt = create_attempt(successful: true, device: device, new_device: device.previously_new_record?)
+      attempt = LoginAttempt.transaction do
+        device = touch_device(cookie.token!)
+        create_attempt(successful: true, device: device, new_device: device.previously_new_record?)
+      end
+      instrument('login_attempt', attempt)
+
       deliver_alert(attempt) if attempt.new_device? && alert && alert?(attempt, had_devices)
+      cookie.write!
       attempt
     end
 
@@ -23,26 +28,31 @@ module DeviseLoginAlerts
       token = DeviceCookie.new(@request).token
       device = token && @user.login_devices.find_by(token_digest: DeviceCookie.digest(@user, token))
 
-      create_attempt(successful: false, failure_reason: reason.to_s, device: device, new_device: device.nil?)
+      attempt = create_attempt(successful: false, failure_reason: reason.to_s, device: device, new_device: device.nil?)
+      instrument('login_attempt', attempt)
+      attempt
     end
 
     private
 
     def touch_device(token)
-      device = @user.login_devices.find_or_initialize_by(token_digest: DeviceCookie.digest(@user, token))
-      device.update!(user_agent: user_agent, last_seen_at: Time.current)
+      digest = DeviceCookie.digest(@user, token)
+      device = @user.login_devices.find_or_initialize_by(token_digest: digest)
+      Device.transaction(requires_new: true) { device.update!(user_agent: user_agent, last_seen_at: Time.current) }
       device
     rescue ActiveRecord::RecordNotUnique
-      @user.login_devices.find_by!(token_digest: DeviceCookie.digest(@user, token))
+      @user.login_devices.find_by!(token_digest: digest)
     end
 
     def create_attempt(**attributes)
       ip = IpResolver.call(@request)
-      attempt = @user.login_attempts.create!(
+      @user.login_attempts.create!(
         scope: @scope, ip: ip, user_agent: user_agent, **LocationResolver.call(@request, ip), **attributes
       )
-      ActiveSupport::Notifications.instrument('login_attempt.devise_login_alerts', login_attempt: attempt)
-      attempt
+    end
+
+    def instrument(event, attempt)
+      ActiveSupport::Notifications.instrument("#{event}.devise_login_alerts", login_attempt: attempt)
     end
 
     def alert?(attempt, had_devices)
@@ -56,7 +66,7 @@ module DeviseLoginAlerts
       message = config.mailer.constantize.with(login_attempt: attempt).new_device_login
       config.deliver_later ? message.deliver_later : message.deliver_now
       attempt.update!(alerted: true)
-      ActiveSupport::Notifications.instrument('new_device_alert.devise_login_alerts', login_attempt: attempt)
+      instrument('new_device_alert', attempt)
     end
 
     def user_agent
