@@ -130,7 +130,7 @@ Sign-in records are personal data. Run the purge on a schedule:
 DeviseLoginAlerts.purge!
 ```
 
-It deletes attempts older than `attempt_retention` and devices unused for `device_retention`. The device cookie is used only to secure sign-ins, which generally falls under the "strictly necessary" exemption from cookie consent (UK PECR, EU ePrivacy). Mention it in your privacy notice.
+It deletes attempts older than `attempt_retention` and devices unused for `device_retention`, except each user's most recent device. Keeping that one means an account whose devices have all aged out doesn't treat its next sign-in, which may not be the owner's, as a silent first device. The device cookie is used only to secure sign-ins, which generally falls under the "strictly necessary" exemption from cookie consent (UK PECR, EU ePrivacy). Mention it in your privacy notice.
 
 ## Development
 

@@ -31,7 +31,17 @@ module DeviseLoginAlerts
 
   def self.purge!(now: Time.current)
     LoginAttempt.where(created_at: ...(now - config.attempt_retention)).in_batches.delete_all
-    Device.where(last_seen_at: ...(now - config.device_retention)).in_batches.delete_all
+    stale_devices(now - config.device_retention).in_batches.delete_all
+  end
+
+  # Each user's newest device is kept, so an account with no devices left can't take a silent first sign-in.
+  def self.stale_devices(cutoff)
+    table = Device.quoted_table_name
+
+    Device.where(last_seen_at: ...cutoff).where(<<~SQL.squish)
+      EXISTS (SELECT 1 FROM #{table} newer WHERE newer.user_type = #{table}.user_type
+      AND newer.user_id = #{table}.user_id AND newer.last_seen_at > #{table}.last_seen_at)
+    SQL
   end
 end
 

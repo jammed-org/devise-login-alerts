@@ -24,6 +24,16 @@ RSpec.describe DeviseLoginAlerts do
       expect { stale_device.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
+    it "keeps each user's newest device even when it is stale" do
+      oldest = device_seen_at(3.years.ago)
+      newest = device_seen_at(2.years.ago)
+
+      described_class.purge!
+
+      expect(user.login_devices).to contain_exactly(newest)
+      expect { oldest.reload }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
     it 'honours configured retention' do
       described_class.config.attempt_retention = 7.days
       attempt_at(8.days.ago)
