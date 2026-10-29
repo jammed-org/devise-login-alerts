@@ -3,6 +3,7 @@ ENV['DATABASE_URL'] = 'sqlite3::memory:'
 
 require_relative 'dummy/config/application'
 Rails.application.initialize!
+Rails.application.reload_routes!
 
 require 'rspec/rails'
 require 'erb'
