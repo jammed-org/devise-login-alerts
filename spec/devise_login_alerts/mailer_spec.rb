@@ -19,8 +19,12 @@ RSpec.describe DeviseLoginAlerts::Mailer do
   it 'describes when, where and on what the sign-in happened' do
     bodies = [mail.html_part, mail.text_part].map { |part| part.body.decoded }
 
-    expect(bodies).to all(include('Hi Ada,', 'ada@example.com', 'Manchester, GB', '203.0.113.9', 'Firefox on Windows',
+    expect(bodies).to all(include('Hi Ada,', 'ada@example.com', 'Manchester, GB', 'Firefox on Windows',
                                   'October 29, 2026 14:03', 'http://example.com/users/password/new'))
+  end
+
+  it 'keeps the IP address out of the email' do
+    expect([mail.html_part, mail.text_part].map { |part| part.body.decoded }).to all(satisfy { |body| body.exclude?('203.0.113.9') })
   end
 
   it 'names the country with the configured lookup' do

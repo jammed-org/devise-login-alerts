@@ -131,6 +131,8 @@ config.country_name = ->(code) { ISO3166::Country[code]&.translation(I18n.locale
 
 ## The email
 
+The alert says when, roughly where and on what browser and system the sign-in happened. The IP address is recorded for the history but kept out of the email.
+
 Override `app/views/devise_login_alerts/mailer/new_device_login.{html,text}.erb` and the `devise_login_alerts.mailer.new_device_login.*` translations, or point `config.mailer` at your own mailer. A custom mailer must respond to `with(login_attempt:).new_device_login`. Set `parent_mailer` to reuse your app's layout and sender.
 
 ## Instrumentation

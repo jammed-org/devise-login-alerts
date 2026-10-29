@@ -5,7 +5,6 @@
 
 <%= t('.when') %>: <%= l(signed_in_at, format: :long) %> (<%= signed_in_at.zone %>)
 <%= t('.where') %>: <%= @login_attempt.location ? "#{@login_attempt.location} (#{t('.where_hint')})" : t('.unknown') %>
-<%= t('.ip_address') %>: <%= @login_attempt.ip || t('.unknown') %>
 <%= t('.device') %>: <%= @login_attempt.device_summary || t('.unknown') %>
 
 <%= t('.was_you') %>
