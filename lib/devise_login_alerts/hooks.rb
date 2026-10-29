@@ -7,6 +7,7 @@ module DeviseLoginAlerts
     def after_set_user(user, warden, options)
       return unless tracked?(user) && warden.authenticated?(options[:scope])
       return if user.respond_to?(:active_for_authentication?) && !user.active_for_authentication?
+      return if remember_me_restore?(warden)
 
       request = ActionDispatch::Request.new(warden.env)
       Tracker.new(user, request, scope: options[:scope]).record_success(alert: !options[:skip_login_alert])
@@ -35,6 +36,10 @@ module DeviseLoginAlerts
       return if conditions.values.any? { |value| !value.is_a?(String) || value.blank? }
 
       mapping.to.find_for_authentication(conditions)
+    end
+
+    def remember_me_restore?(warden)
+      defined?(Devise::Strategies::Rememberable) && warden.winning_strategy.is_a?(Devise::Strategies::Rememberable)
     end
 
     def tracked?(user)

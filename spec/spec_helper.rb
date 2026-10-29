@@ -17,6 +17,7 @@ ActiveRecord::Schema.define do
     t.string :encrypted_password, null: false
     t.string :reset_password_token
     t.datetime :reset_password_sent_at
+    t.datetime :remember_created_at
     t.boolean :disabled, null: false, default: false
   end
 end

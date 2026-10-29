@@ -92,6 +92,14 @@ RSpec.describe 'Sign-in tracking' do
     end
   end
 
+  it 'does not count a remember-me cookie restoring an expired session as a sign-in' do
+    post '/users/sign_in', params: { user: { email: user.email, password: 'correct-horse', remember_me: '1' } }
+    cookies.delete('_dummy_session')
+
+    expect { get '/secret' }.not_to change(DeviseLoginAlerts::LoginAttempt, :count)
+    expect(response).to have_http_status(:ok)
+  end
+
   it 'keys device digests to the user, so a shared browser is not linkable across accounts' do
     other = User.create!(email: 'grace@example.com', password: 'correct-horse')
     sign_in_with
