@@ -13,6 +13,18 @@ module Devise
       def send_login_alert?(_login_attempt)
         true
       end
+
+      def recent_login_attempts(limit = 20)
+        login_attempts.recent.limit(limit)
+      end
+
+      def last_successful_login_attempt
+        login_attempts.successful.recent.first
+      end
+
+      def failed_login_attempts_since(time)
+        login_attempts.failed.where(created_at: time..)
+      end
     end
   end
 end

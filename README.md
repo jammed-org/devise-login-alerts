@@ -27,7 +27,23 @@ class User < ApplicationRecord
 end
 ```
 
-That gives you `user.login_attempts` and `user.login_devices`.
+That gives you:
+
+```ruby
+user.login_attempts                     # every recorded attempt
+user.login_devices                      # browsers this user has signed in from
+user.recent_login_attempts(20)          # newest first
+user.last_successful_login_attempt
+user.failed_login_attempts_since(1.day.ago)
+
+attempt.successful?                     # and failure_reason, e.g. "invalid", "locked"
+attempt.new_device?
+attempt.location                        # "Manchester, GB", or nil
+attempt.device_summary                  # "Firefox on Windows", or nil
+attempt.created_at
+```
+
+Both associations are deleted with the user.
 
 ## How devices are recognised
 
