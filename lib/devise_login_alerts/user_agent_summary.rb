@@ -23,11 +23,7 @@ module DeviseLoginAlerts
     def call(user_agent)
       return if user_agent.blank?
 
-      browser = match(BROWSERS, user_agent)
-      platform = match(PLATFORMS, user_agent)
-      return user_agent.truncate(80) unless browser || platform
-
-      [browser, platform].compact.join(' on ')
+      [match(BROWSERS, user_agent), match(PLATFORMS, user_agent)].compact.join(' on ').presence
     end
 
     def match(patterns, user_agent)

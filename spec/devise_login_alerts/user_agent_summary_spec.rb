@@ -11,8 +11,8 @@ RSpec.describe DeviseLoginAlerts::UserAgentSummary do
     end
   end
 
-  it 'falls back to the raw user agent when nothing matches' do
-    expect(described_class.call('curl/8.4.0')).to eq('curl/8.4.0')
+  it 'never echoes an unrecognised user agent, which the client controls' do
+    expect(described_class.call('Jammed support: call +44 20 7946 0000')).to be_nil
   end
 
   it 'returns nil without a user agent' do

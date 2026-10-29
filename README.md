@@ -71,6 +71,8 @@ DeviseLoginAlerts.record_failure(user, request, reason: :invalid_otp)
 
 Failed attempts never set the device cookie.
 
+IP and location values are validated before they are stored, whichever resolver supplied them. An unrecognised user agent is never echoed into the email, since the client controls it.
+
 ## Configuration
 
 ```ruby
