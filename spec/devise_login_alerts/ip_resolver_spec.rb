@@ -50,6 +50,24 @@ RSpec.describe DeviseLoginAlerts::IpResolver do
     expect(resolve('X-Real-IP', request)).to eq('203.0.113.9')
   end
 
+  it 'falls back to remote_ip when the header is not an IP address' do
+    request = request_with(remote_addr: '198.51.100.4', headers: { 'CF-Connecting-IP' => 'Your bank, London' })
+
+    expect(resolve(:cloudflare, request)).to eq('198.51.100.4')
+  end
+
+  it 'rejects a CIDR range in place of an address' do
+    request = request_with(remote_addr: '198.51.100.4', headers: { 'X-Real-IP' => '203.0.113.0/24' })
+
+    expect(resolve('X-Real-IP', request)).to eq('198.51.100.4')
+  end
+
+  it 'accepts an IPv6 address' do
+    request = request_with(headers: { 'CF-Connecting-IP' => '2001:db8::1' })
+
+    expect(resolve(:cloudflare, request)).to eq('2001:db8::1')
+  end
+
   it 'accepts a callable' do
     expect(resolve(->(_request) { '192.0.2.1' }, request_with)).to eq('192.0.2.1')
   end

@@ -15,13 +15,16 @@ module DeviseLoginAlerts
     module_function
 
     def call(request)
-      resolver = DeviseLoginAlerts.config.ip_resolver
+      ip = resolve(request, DeviseLoginAlerts.config.ip_resolver)
+      ip_address?(ip) ? ip : request.remote_ip
+    end
 
+    def resolve(request, resolver)
       case resolver
       when :remote_ip then request.remote_ip
       when :ip then request.ip
       when :cloudflare then cloudflare(request)
-      when String then header(request, resolver) || request.remote_ip
+      when String then header(request, resolver)
       else resolver.call(request)
       end
     end
@@ -37,10 +40,19 @@ module DeviseLoginAlerts
       value.to_s.split(',').first&.strip.presence
     end
 
+    def ip_address?(value)
+      return false unless value.is_a?(String) && value.match?(/\A[0-9a-fA-F.:]{2,45}\z/)
+
+      IPAddr.new(value)
+      true
+    rescue IPAddr::Error
+      false
+    end
+
     def cloudflare_ip?(ip)
       address = IPAddr.new(ip.to_s)
       CLOUDFLARE_RANGES.any? { |range| range.include?(address) }
-    rescue IPAddr::InvalidAddressError
+    rescue IPAddr::Error
       false
     end
   end

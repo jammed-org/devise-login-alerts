@@ -21,7 +21,23 @@ RSpec.describe DeviseLoginAlerts::LocationResolver do
   end
 
   it 'treats the Cloudflare unknown country as blank' do
-    expect(resolve(:cloudflare, request_with('CF-IPCountry' => 'XX'))).to eq(country_code: nil, city: nil)
+    expect(resolve(:cloudflare, request_with('CF-IPCountry' => 'XX'))).to eq({})
+  end
+
+  it 'drops a country code that is not two letters or digits' do
+    expect(resolve(:cloudflare, request_with('CF-IPCountry' => 'GBR'))).to eq({})
+  end
+
+  it 'strips control characters from the city and caps its length' do
+    request = request_with('CF-IPCity' => "Man\nchester#{'x' * 200}")
+
+    expect(resolve(:cloudflare, request)[:city]).to eq("Manchester#{'x' * 90}")
+  end
+
+  it 'sanitises what a callable returns too' do
+    resolver = ->(_request, _ip) { { country_code: 'gb', city: "\t" } }
+
+    expect(resolve(resolver, request_with)).to eq(country_code: 'GB')
   end
 
   it 'decodes a non-ASCII city' do
