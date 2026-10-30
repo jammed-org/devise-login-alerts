@@ -100,6 +100,13 @@ RSpec.describe 'Sign-in tracking' do
     expect(response).to have_http_status(:ok)
   end
 
+  it 'does not track sign-ins that are not kept in the session, such as HTTP Basic' do
+    credentials = ActionController::HttpAuthentication::Basic.encode_credentials(user.email, 'correct-horse')
+
+    expect { get '/secret', headers: { 'Authorization' => credentials } }.not_to change(DeviseLoginAlerts::LoginAttempt, :count)
+    expect(response).to have_http_status(:ok)
+  end
+
   it 'keys device digests to the user, so a shared browser is not linkable across accounts' do
     other = User.create!(email: 'grace@example.com', password: 'correct-horse')
     sign_in_with

@@ -6,6 +6,7 @@ module DeviseLoginAlerts
 
     def after_set_user(user, warden, options)
       return unless tracked?(user) && warden.authenticated?(options[:scope])
+      return if options[:store] == false
       return if user.respond_to?(:active_for_authentication?) && !user.active_for_authentication?
       return if remember_me_restore?(warden)
 

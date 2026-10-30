@@ -4,7 +4,7 @@ Sign-in history and "new device" alert emails for [Devise](https://github.com/he
 
 - Records every successful and failed sign-in: IP, rough location, user agent, failure reason.
 - Recognises returning browsers with a first-party cookie, and emails the account owner when a sign-in comes from a device it hasn't seen before.
-- Works with any Devise model, and with two-factor gems that sign in only after the second step (such as `devise-otp`). A remember-me cookie restoring an expired session is not counted as a sign-in.
+- Works with any Devise model, and with two-factor gems that sign in only after the second step (such as `devise-otp`). A remember-me cookie restoring an expired session, or a sign-in that isn't kept in the session (HTTP Basic, API tokens), is not counted as a sign-in.
 - The email, the IP source, the location lookup and when to alert are all configurable.
 
 ## Installation

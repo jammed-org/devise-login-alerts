@@ -3,5 +3,6 @@ Devise.setup do |config|
 
   config.mailer_sender = 'security@example.com'
   config.stretches = 1
+  config.http_authenticatable = true
   config.navigational_formats = ['*/*', :html]
 end
