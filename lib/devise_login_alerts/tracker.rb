@@ -17,10 +17,10 @@ module DeviseLoginAlerts
         device = touch_device(cookie.token!)
         create_attempt(successful: true, device: device, new_device: device.previously_new_record?)
       end
-      instrument('login_attempt', attempt)
 
       deliver_alert(attempt) if attempt.new_device? && alert && alert?(attempt, had_devices)
       cookie.write!
+      emit(:sign_in, attempt, first_device: !had_devices)
       attempt
     end
 
@@ -29,7 +29,7 @@ module DeviseLoginAlerts
       device = token && @user.login_devices.find_by(token_digest: DeviceCookie.digest(@user, token))
 
       attempt = create_attempt(successful: false, failure_reason: reason.to_s, device: device, new_device: device.nil?)
-      instrument('login_attempt', attempt)
+      emit(:failed_sign_in, attempt)
       attempt
     end
 
@@ -51,8 +51,16 @@ module DeviseLoginAlerts
       )
     end
 
-    def instrument(event, attempt)
-      ActiveSupport::Notifications.instrument("#{event}.devise_login_alerts", login_attempt: attempt)
+    def emit(name, attempt, first_device: false)
+      event = Event.new(name: name, login_attempt: attempt, first_device: first_device && attempt.new_device?)
+      safely { ActiveSupport::Notifications.instrument("#{name}.devise_login_alerts", event: event, login_attempt: attempt) }
+      safely { config.on_event&.call(event) }
+    end
+
+    def safely
+      yield
+    rescue StandardError => e
+      Rails.error.report(e, handled: true, source: 'devise_login_alerts')
     end
 
     def alert?(attempt, had_devices)
@@ -66,7 +74,6 @@ module DeviseLoginAlerts
       message = config.mailer.constantize.with(login_attempt: attempt).new_device_login
       config.deliver_later ? message.deliver_later : message.deliver_now
       attempt.update!(alerted: true)
-      instrument('new_device_alert', attempt)
     end
 
     def user_agent

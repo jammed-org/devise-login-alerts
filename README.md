@@ -135,12 +135,28 @@ The alert says when, roughly where and on what browser and system the sign-in ha
 
 Override `app/views/devise_login_alerts/mailer/new_device_login.{html,text}.erb` and the `devise_login_alerts.mailer.new_device_login.*` translations, or point `config.mailer` at your own mailer. A custom mailer must respond to `with(login_attempt:).new_device_login`. Set `parent_mailer` to reuse your app's layout and sender.
 
-## Instrumentation
+## Events and metrics
 
-- `login_attempt.devise_login_alerts`, with `login_attempt:`, for every recorded attempt
-- `new_device_alert.devise_login_alerts`, with `login_attempt:`, when an alert is sent
+Every recorded attempt produces an event once its sign-in, device and any alert have been handled:
 
-Tracking errors are reported through `Rails.error` and never block a sign-in.
+| `event.name` | When |
+| --- | --- |
+| `:sign_in` | a successful sign-in |
+| `:failed_sign_in` | a failed attempt for a known account |
+
+The event carries `login_attempt` and offers `successful?`, `failure_reason`, `alerted?`, `user`, and `device`, which is `:first` (the user's first device), `:new` (an unrecognised device for a user with others) or `:known`.
+
+Point `on_event` at your metrics service:
+
+```ruby
+config.on_event = ->(event) do
+  Appsignal.increment_counter('sign_ins', 1, outcome: event.name.to_s, device: event.device.to_s, alerted: event.alerted?.to_s)
+end
+```
+
+The same events are published through ActiveSupport::Notifications as `sign_in.devise_login_alerts` and `failed_sign_in.devise_login_alerts`, with `event:` and `login_attempt:` in the payload.
+
+Errors raised by `on_event` or a subscriber are reported through `Rails.error` and never affect the sign-in. Tracking errors are reported the same way.
 
 ## Retention and privacy
 

@@ -5,6 +5,7 @@ require 'devise_login_alerts/ip_resolver'
 require 'devise_login_alerts/location_resolver'
 require 'devise_login_alerts/device_cookie'
 require 'devise_login_alerts/user_agent_summary'
+require 'devise_login_alerts/event'
 require 'devise_login_alerts/tracker'
 require 'devise_login_alerts/engine'
 

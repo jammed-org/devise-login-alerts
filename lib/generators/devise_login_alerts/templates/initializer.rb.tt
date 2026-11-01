@@ -20,6 +20,9 @@ DeviseLoginAlerts.configure do |config|
 
   # config.skip_alert_if = ->(user, login_attempt) { false }
 
+  # Called after every recorded sign-in and failed attempt, e.g. to count them in your metrics service.
+  # config.on_event = ->(event) { StatsD.increment("sign_ins.#{event.name}", tags: ["device:#{event.device}"]) }
+
   # config.mailer = 'DeviseLoginAlerts::Mailer'
   # config.parent_mailer = 'ActionMailer::Base'
   # config.mailer_sender = 'security@example.com'

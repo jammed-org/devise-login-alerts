@@ -2,7 +2,7 @@ module DeviseLoginAlerts
   class Configuration
     attr_accessor :ip_resolver, :verify_cloudflare_peer, :location_resolver, :country_name,
                   :cookie_name, :cookie_lifetime, :cookie_options,
-                  :alert_on_first_device, :skip_alert_if,
+                  :alert_on_first_device, :skip_alert_if, :on_event,
                   :mailer, :parent_mailer, :mailer_sender, :deliver_later, :app_name, :security_url,
                   :attempt_retention, :device_retention
 
@@ -16,6 +16,7 @@ module DeviseLoginAlerts
       @cookie_options = {}
       @alert_on_first_device = false
       @skip_alert_if = nil
+      @on_event = nil
       @mailer = 'DeviseLoginAlerts::Mailer'
       @parent_mailer = 'ActionMailer::Base'
       @mailer_sender = nil
