@@ -1,4 +1,113 @@
-inherit_from: ../../.rubocop.yml
+plugins:
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-rspec_rails
+  - rubocop-performance
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.2
+  Exclude:
+    - "**/*.gemspec"
+    - "vendor/**/*"
+    - "spec/dummy/tmp/**/*"
+    - "Gemfile*"
 
 Rails/ApplicationRecord:
+  Enabled: false
+
+# params.expect needs Rails 8; the gem supports 7.1
+Rails/StrongParametersExpect:
+  Enabled: false
+
+Layout/LineLength:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Layout/EndOfLine:
+  Enabled: false
+
+Layout/TrailingWhitespace:
+  Enabled: true
+
+Layout/TrailingEmptyLines:
+  Enabled: true
+
+Style/Documentation:
+  Enabled: false
+Style/EmptyMethod:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/AndOr:
+  Enabled: false
+Style/AsciiComments:
+  Enabled: false
+Style/StringLiterals:
+  Enabled: false
+
+Style/CollectionMethods:
+  PreferredMethods:
+    collect: "map"
+    collect!: "map!"
+    inject: "reduce"
+    detect: "find"
+    find_all: "select"
+
+Layout/DotPosition:
+  EnforcedStyle: leading
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Style/ConditionalAssignment:
+  Enabled: false
+
+RSpec/NamedSubject:
+  Enabled: false
+RSpec/MessageChain:
+  Enabled: false
+RSpec/ContextWording:
+  Enabled: false
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+RSpec/MultipleExpectations:
+  Enabled: false
+RSpec/ExampleLength:
+  Enabled: false
+RSpec/NestedGroups:
+  Enabled: false
+RSpec/MessageSpies:
+  Enabled: false
+RSpec/IndexedLet:
+  Enabled: false
+RSpec/LetSetup:
+  Enabled: false
+RSpec/VerifiedDoubles:
+  Enabled: false
+RSpec/RepeatedDescription:
+  Enabled: false
+RSpec/RepeatedExampleGroupBody:
   Enabled: false
