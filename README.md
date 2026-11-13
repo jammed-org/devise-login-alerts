@@ -9,9 +9,11 @@ Sign-in history and "new device" alert emails for [Devise](https://github.com/he
 
 ## Installation
 
+Not on RubyGems yet, so install it from GitHub:
+
 ```ruby
 # Gemfile
-gem 'devise_login_alerts'
+gem 'devise_login_alerts', github: 'jammed-org/devise-login-alerts'
 ```
 
 ```bash
@@ -173,7 +175,10 @@ It deletes attempts older than `attempt_retention` and devices unused for `devic
 ```bash
 bundle install
 bundle exec rspec
+bundle exec rubocop
 ```
+
+The specs run against a small Rails app in `spec/dummy`, on an in-memory SQLite database.
 
 ## License
 
