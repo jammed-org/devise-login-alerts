@@ -10,7 +10,7 @@ Sign-in history and "new device" alert emails for [Devise](https://github.com/he
 ## Requirements
 
 - Ruby 3.2 or newer
-- Rails 7.1 or newer
+- Rails 7.1 to 8.x
 - Devise 4.9 or newer
 
 ## Installation

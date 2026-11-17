@@ -14,10 +14,10 @@ Gem::Specification.new do |spec|
   spec.files = Dir['{app,config,lib}/**/*', 'LICENSE.txt', 'README.md', 'CHANGELOG.md']
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'actionmailer', '>= 7.1'
-  spec.add_dependency 'activerecord', '>= 7.1'
+  spec.add_dependency 'actionmailer', '>= 7.1', '< 9'
+  spec.add_dependency 'activerecord', '>= 7.1', '< 9'
   spec.add_dependency 'devise', '>= 4.9', '< 6'
-  spec.add_dependency 'railties', '>= 7.1'
+  spec.add_dependency 'railties', '>= 7.1', '< 9'
   spec.metadata['source_code_uri'] = spec.homepage
   spec.metadata['changelog_uri'] = "#{spec.homepage}/blob/main/CHANGELOG.md"
   spec.metadata['bug_tracker_uri'] = "#{spec.homepage}/issues"

@@ -29,7 +29,7 @@ Run both `rspec` and `rubocop` before saying a change is done. CI runs specs on 
 
 ## Compatibility rules
 
-The gem supports Ruby >= 3.2, Rails >= 7.1 and Devise >= 4.9 (< 6). Don't break them:
+The gem supports Ruby >= 3.2, Rails 7.1 to 8.x (< 9) and Devise 4.9 to 5.x (< 6). Don't break them:
 
 - No Ruby 3.3+ features or core-library methods. Rubocop targets 3.2 and will catch syntax, not core-library calls.
 - No Rails 7.2+/8 APIs (for example `params.expect`). Check the Rails 7.1 docs when unsure.
