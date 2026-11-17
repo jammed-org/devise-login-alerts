@@ -1,0 +1,43 @@
+name: Release
+
+# Publishes the gem to RubyGems when a version tag (e.g. v0.1.0) is pushed.
+# Uses RubyGems trusted publishing (OIDC), so no API key is stored in GitHub.
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    name: Publish to RubyGems
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write   # create the GitHub release
+      id-token: write   # trusted publishing to RubyGems
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Check tag matches gem version
+        run: |
+          version=$(ruby -r ./lib/devise_login_alerts/version -e 'print DeviseLoginAlerts::VERSION')
+          if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match DeviseLoginAlerts::VERSION ${version}"
+            exit 1
+          fi
+
+      - run: bundle exec rspec
+      - run: bundle exec rubocop
+
+      - uses: rubygems/release-gem@v1
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" --verify-tag --generate-notes --title "${GITHUB_REF_NAME}"

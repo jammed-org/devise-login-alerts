@@ -200,11 +200,13 @@ The specs run against a small Rails app in `spec/dummy`, on an in-memory SQLite 
 
 ### Releasing
 
-Maintainers only:
+Maintainers only. Releases are published by the `Release` GitHub Actions workflow using [RubyGems trusted publishing](https://guides.rubygems.org/trusted-publishing/), so nobody needs a RubyGems API key.
 
 1. Update `DeviseLoginAlerts::VERSION` in `lib/devise_login_alerts/version.rb` and date the release in `CHANGELOG.md`.
-2. Commit, then run `gem build devise_login_alerts.gemspec` and `gem push devise_login_alerts-X.Y.Z.gem` (RubyGems MFA is required).
-3. Tag the release: `git tag vX.Y.Z && git push --tags`.
+2. Commit and push to `main`, and wait for CI to pass.
+3. Tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+The workflow checks the tag matches `VERSION`, runs the specs and rubocop, pushes the gem to RubyGems and creates a GitHub release.
 
 ### Security issues
 
