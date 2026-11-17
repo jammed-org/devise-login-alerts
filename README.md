@@ -7,13 +7,17 @@ Sign-in history and "new device" alert emails for [Devise](https://github.com/he
 - Works with any Devise model, and with two-factor gems that sign in only after the second step (such as `devise-otp`). A remember-me cookie restoring an expired session, or a sign-in that isn't kept in the session (HTTP Basic, API tokens), is not counted as a sign-in.
 - The email, the IP source, the location lookup and when to alert are all configurable.
 
-## Installation
+## Requirements
 
-Not on RubyGems yet, so install it from GitHub:
+- Ruby 3.2 or newer
+- Rails 7.1 or newer
+- Devise 4.9 or newer
+
+## Installation
 
 ```ruby
 # Gemfile
-gem 'devise_login_alerts', github: 'jammed-org/devise-login-alerts'
+gem 'devise_login_alerts'
 ```
 
 ```bash
@@ -170,7 +174,11 @@ DeviseLoginAlerts.purge!
 
 It deletes attempts older than `attempt_retention` and devices unused for `device_retention`, except each user's most recent device. Keeping that one means an account whose devices have all aged out doesn't treat its next sign-in, which may not be the owner's, as a silent first device. The device cookie is used only to secure sign-ins, which generally falls under the "strictly necessary" exemption from cookie consent (UK PECR, EU ePrivacy). Mention it in your privacy notice.
 
-## Development
+## Contributing
+
+Bug reports and pull requests are welcome at <https://github.com/jammed-org/devise-login-alerts>. For anything bigger than a small fix, open an issue first so we can agree on the approach.
+
+### Setting up
 
 ```bash
 bundle install
@@ -178,7 +186,33 @@ bundle exec rspec
 bundle exec rubocop
 ```
 
-The specs run against a small Rails app in `spec/dummy`, on an in-memory SQLite database.
+The specs run against a small Rails app in `spec/dummy`, on an in-memory SQLite database, so there is nothing else to set up.
+
+`Gemfile.lock` is not committed. CI resolves dependencies fresh on each supported Ruby version (3.2 to 3.4), so each one gets the newest gems it can run.
+
+### Pull requests
+
+- Add or update specs for any behaviour change. Request specs in `spec/requests` cover the sign-in flow end to end.
+- Keep `bundle exec rspec` and `bundle exec rubocop` passing. CI runs both on every pull request.
+- Don't use syntax or core classes newer than Ruby 3.2, or Rails APIs newer than 7.1.
+- Add a line to the "unreleased" section of `CHANGELOG.md` describing the change for users.
+- Be careful with anything that stores or shows personal data: IP addresses, locations and user agents. Validate what is stored, and keep the IP out of the email.
+
+### Releasing
+
+Maintainers only:
+
+1. Update `DeviseLoginAlerts::VERSION` in `lib/devise_login_alerts/version.rb` and date the release in `CHANGELOG.md`.
+2. Commit, then run `gem build devise_login_alerts.gemspec` and `gem push devise_login_alerts-X.Y.Z.gem` (RubyGems MFA is required).
+3. Tag the release: `git tag vX.Y.Z && git push --tags`.
+
+### Security issues
+
+Please don't open public issues for security problems. Report them privately through GitHub's "Report a vulnerability" button on the repository's Security tab.
+
+### Using an AI coding agent
+
+[AGENTS.md](AGENTS.md) has instructions for coding agents (Claude Code, Codex, Cursor and others) working in this repository.
 
 ## License
 

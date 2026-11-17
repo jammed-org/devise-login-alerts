@@ -9,3 +9,4 @@
 - Install generator and retention purge.
 - `on_event` hook and ActiveSupport notifications for every sign-in and failed attempt, for metrics.
 - `recent_login_attempts`, `last_successful_login_attempt` and `failed_login_attempts_since` on the model.
+- Supports Ruby 3.2+, Rails 7.1+ and Devise 4.9+.
